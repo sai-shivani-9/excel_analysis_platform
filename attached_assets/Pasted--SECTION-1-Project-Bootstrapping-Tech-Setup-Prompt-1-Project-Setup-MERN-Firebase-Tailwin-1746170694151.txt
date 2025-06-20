@@ -1,0 +1,68 @@
+🧠 SECTION 1: Project Bootstrapping + Tech Setup
+Prompt 1: Project Setup (MERN + Firebase + Tailwind/MUI)
+diff
+CopyEdit
+Create a MERN stack project with the following structure: - Frontend: React with Tailwind CSS or Material UI - State management: Redux Toolkit - Backend: Express.js with Node.js - Database: MongoDB (Atlas) - Add Firebase Authentication with email/password login and signup - Setup basic routing and layout with a dashboard, login, signup, and upload page - Use React Router DOM for navigation - Deploy-ready setup with Git and GitHub
+
+
+🧠 SECTION 2: Authentication with Firebase
+Prompt 2: Firebase Auth Integration
+pgsql
+CopyEdit
+Integrate Firebase Authentication in a React app using Firebase SDK. - Use email/password for login and signup - Store user session with Firebase Auth persistence - Create a protected route component to guard dashboard - Display user info in a navbar - Implement logout functionality
+
+
+🧠 SECTION 3: Backend Setup (Node + Express + MongoDB)
+Prompt 3: Express + MongoDB Backend Setup
+diff
+CopyEdit
+Build an Express.js backend with: - MongoDB connection (via Mongoose) - Routes: /api/upload, /api/charts, /api/user (basic CRUD) - Multer for file upload (Excel files only) - Store uploaded file metadata (name, userId, timestamp) in MongoDB - Setup CORS, body-parser, dotenv
+
+
+🧠 SECTION 4: File Upload + Parsing with SheetJS
+Prompt 4: Upload and Parse Excel
+sql
+CopyEdit
+In React: - Add a file input (drag-and-drop or button) - When a user uploads an Excel file, parse it with SheetJS (xlsx) - Show a preview of the first few rows in a table - Auto-detect column data types (number, string, date) - Allow user to map columns (X-axis, Y-axis)
+
+
+🧠 SECTION 5: Charts + Filtering + Export
+Prompt 5: Chart Rendering & Export
+sql
+CopyEdit
+Build a chart module in React using Recharts or Chart.js: - Render dynamic charts based on selected X/Y columns - Support bar, line, and pie chart types - Allow switching between them via dropdown - Add a filter panel to filter dataset before visualization - Add download buttons to export: - PNG (via html2canvas) - PDF (via jsPDF)
+
+
+🧠 SECTION 6: Redux Toolkit Integration
+Prompt 6: Redux State Management
+diff
+CopyEdit
+Set up Redux Toolkit: - Create slices for: auth, file uploads, chart settings - Use Redux Toolkit Query (RTK Query) for backend API calls - Persist state (auth info, chart preferences, filters)
+
+
+🧠 SECTION 7: UI Features (Dark Mode, Responsive)
+Prompt 7: Theme Toggle + UI
+diff
+CopyEdit
+Implement light/dark theme toggle: - If using Tailwind: use dark mode utility classes - If using Material UI: toggle MUI theme palette - Save theme preference in localStorage - Make layout responsive across desktop/mobile/tablet
+
+
+🧠 SECTION 8: Collaboration via Email
+Prompt 8: Email-based Sharing
+vbnet
+CopyEdit
+Implement basic email collaboration: - Allow user to enter another user’s email to share a chart - On backend, store shared chart entry with both users - In dashboard, show charts shared with you and by you - Optional: trigger email notification using Nodemailer or Firebase functions
+
+
+🧠 SECTION 9: Testing + Deployment
+Prompt 9: Postman API Testing + GitHub Deployment
+diff
+CopyEdit
+Create Postman collections for: - Auth routes (login/signup) - File upload API - Chart metadata endpoints Deploy frontend to Vercel or Netlify Deploy backend to Render or Railway Push code to GitHub and connect CI/CD
+
+
+🧠 SECTION 10: Optional Enhancements
+Prompt 10: (Bonus) Add Chart History + Save View
+diff
+CopyEdit
+Add a “My History” dashboard: - Store uploaded Excel + selected chart settings in MongoDB - Allow users to revisit and re-render charts - Add option to favorite charts
