@@ -1,0 +1,11 @@
+{
+  "name": "excel-analysis-platform-root",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently \"cd server && npm start\" \"cd client && npm start\"",
+    "install": "cd server && npm install && cd ../client && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^7.0.0"
+  }
+}
