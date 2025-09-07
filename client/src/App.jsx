@@ -84,7 +84,7 @@ const AuthPage = ({ onLoginSuccess }) => {
         const payload = isLogin ? { email, password } : { name, email, password };
 
         try {
-            const response = await fetch(`http://localhost:5000${url}`, {
+            const response = await fetch(`http://localhost:5000/api/auth${url.replace('/api', '')}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
