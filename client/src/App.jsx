@@ -634,7 +634,7 @@ const Dashboard = ({ user, token, onLogout, scriptsLoaded, onAnalysis, onViewHis
                                 color: '#1f2937'
                                 }
                             }
-                        },
+                        }
                     } : {}
                 }
             });
