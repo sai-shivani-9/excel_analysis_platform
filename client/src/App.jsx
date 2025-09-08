@@ -405,51 +405,7 @@ const Dashboard = ({ user, token, onLogout, scriptsLoaded, onAnalysis, onViewHis
                 data: data,
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleColor: 'white',
-                            bodyColor: 'white',
-                            borderColor: 'rgba(255, 255, 255, 0.2)',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            displayColors: true
-                        }
-                    },
-                    scales: type !== 'pie' ? {
-                        x: {
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            },
-                            ticks: {
-                                font: {
-                                    size: 11
-                                }
-                            }
-                        },
-                        y: {
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            },
-                            ticks: {
-                                font: {
-                                    size: 11
-                                }
-                            }
-                        }
-                    } : {}
+                    maintainAspectRatio: false
                 }
             });
         }
@@ -520,26 +476,7 @@ const Dashboard = ({ user, token, onLogout, scriptsLoaded, onAnalysis, onViewHis
             </div>
             {chartData && (
               <div className="mt-4 flex justify-end space-x-4">
-                <button 
-                  onClick={() => downloadChart('png')} 
-                  className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 disabled:opacity-50 flex items-center space-x-2" 
-                  disabled={!scriptsLoaded}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span>PNG</span>
-                </button>
-                <button 
-                  onClick={() => downloadChart('pdf')} 
-                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 disabled:opacity-50 flex items-center space-x-2" 
-                  disabled={!scriptsLoaded}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <span>PDF</span>
-                </button>
+                <button onClick={() => downloadChart('png')} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 disabled:opacity-50" disabled={!scriptsLoaded}>Download Chart</button>
               </div>
             )}
           </div>
