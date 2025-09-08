@@ -171,21 +171,54 @@ const PlotlySurfacePlot = ({ data, xAxisLabel, yAxisLabel }) => {
            x: data.labels,
            y: [yAxisLabel, ""],
            type: 'surface',
-           colorscale: 'Electric',
-           showscale: false
+           colorscale: [
+               [0, '#440154'],    // Deep purple
+               [0.1, '#482777'],  // Purple
+               [0.2, '#3f4a8a'],  // Blue-purple
+               [0.3, '#31678e'],  // Blue
+               [0.4, '#26838f'],  // Teal
+               [0.5, '#1f9d8a'],  // Green-teal
+               [0.6, '#6cce5a'],  // Green
+               [0.7, '#b6de2b'],  // Yellow-green
+               [0.8, '#fee825'],  // Yellow
+               [0.9, '#fde725']   // Bright yellow
+           ],
+           showscale: true,
+           colorbar: {
+               title: yAxisLabel,
+               titlefont: { size: 14, color: '#1f2937' },
+               tickfont: { size: 12, color: '#374151' }
+           }
         }];
 
         const layout = {
-            title: { text: data.datasets[0].label, font: { color: '#4b5563' } },
+            title: { 
+                text: `3D Surface: ${data.datasets[0].label}`, 
+                font: { 
+                    color: '#1f2937', 
+                    size: 18,
+                    family: 'Roboto, sans-serif'
+                } 
+            },
             autosize: true,
             paper_bgcolor: '#ffffff',
             plot_bgcolor: '#ffffff',
-            font: { color: '#4b5563' },
+            font: { color: '#374151', family: 'Roboto, sans-serif' },
             scene: {
-                xaxis:{title: xAxisLabel},
-                yaxis:{title: ''},
-                zaxis:{title: yAxisLabel},
-                camera: { eye: {x: 1.87, y: 0.88, z: -0.64} }
+                xaxis: {
+                    title: { text: xAxisLabel, font: { size: 14, color: '#1f2937' } },
+                    tickfont: { size: 12, color: '#374151' }
+                },
+                yaxis: {
+                    title: { text: '', font: { size: 14, color: '#1f2937' } },
+                    tickfont: { size: 12, color: '#374151' }
+                },
+                zaxis: {
+                    title: { text: yAxisLabel, font: { size: 14, color: '#1f2937' } },
+                    tickfont: { size: 12, color: '#374151' }
+                },
+                camera: { eye: {x: 1.87, y: 0.88, z: -0.64} },
+                bgcolor: 'rgba(0,0,0,0)'
             },
             margin: { l: 0, r: 0, b: 0, t: 40 }
         };
@@ -334,27 +367,82 @@ const Dashboard = ({ user, token, onLogout, scriptsLoaded, onAnalysis, onViewHis
         return acc;
     }, {});
     const chartValues = labels.map(label => yAxisData[label] || 0);
+    
+    // Generate vibrant colors based on chart type
+    let backgroundColors, borderColors;
+    
+    if (chartType === 'bar') {
+      // Vibrant colors for bar charts
+      const barColors = [
+        'rgba(255, 99, 132, 0.8)',   // Red
+        'rgba(54, 162, 235, 0.8)',   // Blue
+        'rgba(255, 205, 86, 0.8)',   // Yellow
+        'rgba(75, 192, 192, 0.8)',   // Teal
+        'rgba(153, 102, 255, 0.8)',  // Purple
+        'rgba(255, 159, 64, 0.8)',   // Orange
+        'rgba(199, 199, 199, 0.8)',  // Grey
+        'rgba(83, 102, 255, 0.8)',   // Indigo
+        'rgba(255, 99, 255, 0.8)',   // Pink
+        'rgba(99, 255, 132, 0.8)',   // Green
+        'rgba(255, 206, 84, 0.8)',   // Amber
+        'rgba(54, 235, 162, 0.8)'    // Mint
+      ];
+      const barBorderColors = [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 205, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)',
+        'rgba(199, 199, 199, 1)',
+        'rgba(83, 102, 255, 1)',
+        'rgba(255, 99, 255, 1)',
+        'rgba(99, 255, 132, 1)',
+        'rgba(255, 206, 84, 1)',
+        'rgba(54, 235, 162, 1)'
+      ];
+      backgroundColors = labels.map((_, index) => barColors[index % barColors.length]);
+      borderColors = labels.map((_, index) => barBorderColors[index % barBorderColors.length]);
+    } else if (chartType === 'line') {
+      // Gradient colors for line charts
+      backgroundColors = 'rgba(34, 197, 94, 0.2)';  // Green gradient
+      borderColors = 'rgba(34, 197, 94, 1)';
+    } else if (chartType === 'pie') {
+      // Vibrant pie colors
+      const pieColors = [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+        '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384',
+        '#36A2EB', '#FFCE56', '#FF9F40', '#9966FF', '#4BC0C0',
+        '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+        '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+      ];
+      backgroundColors = labels.map((_, index) => pieColors[index % pieColors.length]);
+      borderColors = labels.map((_, index) => pieColors[index % pieColors.length]);
+    } else {
+      // Default colors for 3D surface
+      backgroundColors = 'rgba(139, 92, 246, 0.7)';
+      borderColors = 'rgba(139, 92, 246, 1)';
+    }
+    
     const newChartData = {
       labels,
       datasets: [{
           label: `${yAxis} by ${xAxis}`,
           data: chartValues,
-          backgroundColor: chartType === 'pie' ? generatePieColors(labels.length) : 'rgba(139, 92, 246, 0.7)',
-          borderColor: chartType === 'pie' ? generatePieColors(labels.length, 1) : 'rgba(139, 92, 246, 1)',
+          backgroundColor: backgroundColors,
+          borderColor: borderColors,
           borderWidth: 1,
+          tension: chartType === 'line' ? 0.4 : 0,
+          fill: chartType === 'line' ? true : false,
+          pointBackgroundColor: chartType === 'line' ? 'rgba(34, 197, 94, 1)' : undefined,
+          pointBorderColor: chartType === 'line' ? '#fff' : undefined,
+          pointHoverBackgroundColor: chartType === 'line' ? '#fff' : undefined,
+          pointHoverBorderColor: chartType === 'line' ? 'rgba(34, 197, 94, 1)' : undefined,
       }],
     };
     setChartData(newChartData);
   };
   
-  const generatePieColors = (numColors) => {
-    const colors = [];
-    const baseColors = ['#a855f7', '#9333ea', '#7e22ce', '#6b21a8', '#581c87'];
-    for(let i = 0; i < numColors; i++) {
-        colors.push(baseColors[i % baseColors.length]);
-    }
-    return colors;
-  }
 
   const downloadChart = (format) => {
     const is3D = chartType === '3d-surface';
@@ -363,31 +451,96 @@ const Dashboard = ({ user, token, onLogout, scriptsLoaded, onAnalysis, onViewHis
         console.error("Chart container ref not found.");
         return;
     }
+    
     if (is3D) {
         if (!window.Plotly) { console.error("Plotly library not loaded."); return; }
         const plotDiv = chartContainer.querySelector('.js-plotly-plot');
         if (plotDiv) {
-            window.Plotly.downloadImage(plotDiv, {format: 'png', width: 800, height: 600, filename: 'surface-plot'});
+            if (format === 'png') {
+                window.Plotly.downloadImage(plotDiv, {
+                    format: 'png', 
+                    width: 1200, 
+                    height: 800, 
+                    filename: `3d-surface-${new Date().getTime()}`
+                });
+            } else if (format === 'pdf') {
+                window.Plotly.downloadImage(plotDiv, {
+                    format: 'pdf', 
+                    width: 1200, 
+                    height: 800, 
+                    filename: `3d-surface-${new Date().getTime()}`
+                });
+            }
         } else {
             console.error("Could not find Plotly plot to download.");
         }
         return;
-    } 
-    if (!window.html2canvas) { console.error("Download library (html2canvas) not loaded."); return; }
+    }
+    
+    // For 2D charts (bar, line, pie)
     const exportCanvas = chartContainer.querySelector('canvas');
     if (!exportCanvas) { 
         console.error("Could not find canvas to download."); 
         return; 
     }
-    window.html2canvas(exportCanvas, { useCORS: true, backgroundColor: '#ffffff' }).then((canvas) => {
-      const image = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = 'chart.png';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    });
+    
+    if (format === 'png') {
+        if (!window.html2canvas) { 
+            console.error("html2canvas library not loaded."); 
+            return; 
+        }
+        window.html2canvas(exportCanvas, { 
+            useCORS: true, 
+            backgroundColor: '#ffffff',
+            scale: 2
+        }).then((canvas) => {
+            const image = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = image;
+            link.download = `${chartType}-chart-${new Date().getTime()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    } else if (format === 'pdf') {
+        if (!window.html2canvas || !window.jsPDF) { 
+            console.error("Required libraries not loaded for PDF export."); 
+            return; 
+        }
+        window.html2canvas(exportCanvas, { 
+            useCORS: true, 
+            backgroundColor: '#ffffff',
+            scale: 2
+        }).then((canvas) => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new window.jsPDF.jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+            
+            // Calculate dimensions to fit the page
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+            const imgX = (pdfWidth - imgWidth * ratio) / 2;
+            const imgY = (pdfHeight - imgHeight * ratio) / 2;
+            
+            // Add title
+            pdf.setFontSize(16);
+            pdf.text(`${chartType.toUpperCase()} Chart - ${yAxis} by ${xAxis}`, 20, 20);
+            pdf.setFontSize(10);
+            pdf.text(`Generated on: ${new Date().toLocaleString()}`, 20, 30);
+            
+            // Add chart image
+            pdf.addImage(imgData, 'PNG', imgX, imgY + 20, imgWidth * ratio, imgHeight * ratio);
+            
+            // Save PDF
+            pdf.save(`${chartType}-chart-${new Date().getTime()}.pdf`);
+        });
+    }
   };
 
   const Chart2D = ({type, data}) => {
@@ -414,41 +567,74 @@ const Dashboard = ({ user, token, onLogout, scriptsLoaded, onAnalysis, onViewHis
                                 usePointStyle: true,
                                 padding: 20,
                                 font: {
-                                    size: 12
+                                    size: 14,
+                                    weight: 'bold'
                                 }
                             }
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
                             titleColor: 'white',
                             bodyColor: 'white',
-                            borderColor: 'rgba(255, 255, 255, 0.2)',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            displayColors: true
+                            borderColor: 'rgba(255, 255, 255, 0.3)',
+                            borderWidth: 2,
+                            cornerRadius: 10,
+                            displayColors: true,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            }
                         }
                     },
                     scales: type !== 'pie' ? {
                         x: {
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
+                                color: 'rgba(0, 0, 0, 0.1)',
+                                lineWidth: 1
                             },
                             ticks: {
                                 font: {
-                                    size: 11
-                                }
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#374151'
+                            },
+                            title: {
+                                display: true,
+                                text: xAxis,
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#1f2937'
                             }
                         },
                         y: {
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
+                                color: 'rgba(0, 0, 0, 0.1)',
+                                lineWidth: 1
                             },
                             ticks: {
                                 font: {
-                                    size: 11
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#374151'
+                            },
+                            title: {
+                                display: true,
+                                text: yAxis,
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#1f2937'
                                 }
                             }
-                        }
+                        },
                     } : {}
                 }
             });
