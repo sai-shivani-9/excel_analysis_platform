@@ -169,7 +169,7 @@ const PlotlySurfacePlot = ({ data, xAxisLabel, yAxisLabel }) => {
         const plotData = [{
            z: z_data,
            x: data.labels,
-           y: [yAxisLabel, ""],
+           y: [0, 1],
            type: 'surface',
            colorscale: 'Electric',
            showscale: false
