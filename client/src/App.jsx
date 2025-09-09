@@ -227,11 +227,13 @@ const HistoryPage = ({ user, onLogout, history, onBack }) => {
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {history.map((item, index) => (
                                         <tr key={index} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.fileName}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.fileName || 'Unknown File'}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.date}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.xAxis}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.yAxis}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{item.chartType.replace('3d-surface', '3D Surface Plot')}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.xAxis || 'N/A'}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.yAxis || 'N/A'}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                                                {item.chartType ? item.chartType.replace('3d-surface', '3D Surface Plot') : 'Unknown'}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -334,27 +336,71 @@ const Dashboard = ({ user, token, onLogout, scriptsLoaded, onAnalysis, onViewHis
         return acc;
     }, {});
     const chartValues = labels.map(label => yAxisData[label] || 0);
+    
+    // Generate vibrant colors for different chart types
+    const generateColors = (count, type) => {
+      const colorPalettes = {
+        bar: [
+          'rgba(255, 99, 132, 0.8)',   // Red
+          'rgba(54, 162, 235, 0.8)',   // Blue
+          'rgba(255, 205, 86, 0.8)',   // Yellow
+          'rgba(75, 192, 192, 0.8)',   // Teal
+          'rgba(153, 102, 255, 0.8)',  // Purple
+          'rgba(255, 159, 64, 0.8)',   // Orange
+          'rgba(199, 199, 199, 0.8)',  // Grey
+          'rgba(83, 102, 255, 0.8)',   // Indigo
+          'rgba(255, 99, 255, 0.8)',   // Pink
+          'rgba(99, 255, 132, 0.8)',   // Green
+          'rgba(255, 206, 84, 0.8)',   // Amber
+          'rgba(54, 235, 162, 0.8)'    // Mint
+        ],
+        line: [
+          'rgba(75, 192, 192, 0.6)',   // Teal
+          'rgba(255, 99, 132, 0.6)',   // Red
+          'rgba(54, 162, 235, 0.6)',   // Blue
+          'rgba(153, 102, 255, 0.6)',  // Purple
+          'rgba(255, 159, 64, 0.6)'    // Orange
+        ],
+        pie: [
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+          '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384',
+          '#36A2EB', '#FFCE56', '#9966FF', '#FF9F40', '#C9CBCF',
+          '#FF99CC', '#66FF99', '#99CCFF', '#FFCC99', '#CC99FF',
+          '#99FFCC', '#CCFF99', '#FF9999', '#99CCCC', '#FFCCFF'
+        ]
+      };
+      
+      const palette = colorPalettes[type] || colorPalettes.bar;
+      const colors = [];
+      for (let i = 0; i < count; i++) {
+        colors.push(palette[i % palette.length]);
+      }
+      return colors;
+    };
+    
+    const colors = generateColors(labels.length, chartType);
+    const borderColors = chartType === 'pie' ? colors : colors.map(color => 
+      color.replace('0.8', '1').replace('0.6', '1')
+    );
+    
     const newChartData = {
       labels,
       datasets: [{
           label: `${yAxis} by ${xAxis}`,
           data: chartValues,
-          backgroundColor: chartType === 'pie' ? generatePieColors(labels.length) : 'rgba(139, 92, 246, 0.7)',
-          borderColor: chartType === 'pie' ? generatePieColors(labels.length, 1) : 'rgba(139, 92, 246, 1)',
-          borderWidth: 1,
+          backgroundColor: colors,
+          borderColor: borderColors,
+          borderWidth: chartType === 'pie' ? 2 : 1,
+          fill: chartType === 'line' ? true : false,
+          tension: chartType === 'line' ? 0.4 : 0,
+          pointBackgroundColor: chartType === 'line' ? borderColors : undefined,
+          pointBorderColor: chartType === 'line' ? '#fff' : undefined,
+          pointBorderWidth: chartType === 'line' ? 2 : undefined,
+          pointRadius: chartType === 'line' ? 5 : undefined,
       }],
     };
     setChartData(newChartData);
   };
-  
-  const generatePieColors = (numColors) => {
-    const colors = [];
-    const baseColors = ['#a855f7', '#9333ea', '#7e22ce', '#6b21a8', '#581c87'];
-    for(let i = 0; i < numColors; i++) {
-        colors.push(baseColors[i % baseColors.length]);
-    }
-    return colors;
-  }
 
   const downloadChart = (format) => {
     const is3D = chartType === '3d-surface';
@@ -405,7 +451,63 @@ const Dashboard = ({ user, token, onLogout, scriptsLoaded, onAnalysis, onViewHis
                 data: data,
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                color: '#374151',
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: '#374151',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true
+                        }
+                    },
+                    scales: type !== 'pie' ? {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Categories',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#374151'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Values',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#374151'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    } : {}
                 }
             });
         }
@@ -531,9 +633,10 @@ const App = () => {
                     throw new Error('Failed to fetch history');
                 }
                 const data = await response.json();
-                setAnalysisHistory(data);
+                setAnalysisHistory(data.data || data || []);
               } catch (error) {
                   console.error(error);
+                  setAnalysisHistory([]);
               }
           }
       };
@@ -541,6 +644,30 @@ const App = () => {
           fetchHistory();
       }
   }, [currentPage, token]);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Verify token is still valid
+      fetch('http://localhost:5000/api/auth/me', {
+        headers: { 'x-auth-token': token }
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Invalid token');
+      })
+      .then(data => {
+        setUser(data.user);
+        setToken(token);
+        setCurrentPage('dashboard');
+      })
+      .catch(() => {
+        localStorage.removeItem('token');
+        setCurrentPage('auth');
+      });
+    }
+  }, []);
 
   const renderPage = () => {
       switch(currentPage) {
